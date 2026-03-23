@@ -1,89 +1,38 @@
-# Shaiya Updater
+# 🌸 Shaiya Lotus Updater - Ultimate Edition
 
-## Environment
+![Shaiya Lotus Banner](https://shaiyalotus.com/resources/images/logo.png)
 
-Windows 10
+A modern, high-performance, and visually stunning game launcher for **Shaiya Lotus**. Built with .NET 8 and WPF, this updater focuses on providing users with a premium experience from the moment they launch the game.
 
-Visual Studio 2022
+## ✨ Key Features
 
-C# 12
+- **🌀 Dynamic Backgrounds**: High-definition rotating artwork featuring the Goddesses of Light and Darkness, with smooth cross-fade transitions every 10 seconds.
+- **💓 Breathing Play Button**: An interactive "JUGAR" button that pulses with life once the game is fully updated, providing clear visual feedback.
+- **🟢 Real-time Server Status**: An integrated live connectivity indicator that pings the login server every 20 seconds to show if the server is Online or Offline.
+- **🚀 Advanced Auto-Update**: Seamlessly self-updates to the latest launcher version (currently v1000) using an automated replacement engine.
+- **📱 External Navigation**: Discord, News, and Download buttons launch directly in the user's default browser for a better reading experience.
+- **⚡ Performance Optimized**: Compiled as an x86 standalone executable with native library compression for fast startup and low resource usage.
 
-Windows Presentation Foundation (WPF)
+## 🛠️ Build & Development
 
-## Prerequisites
+This project is optimized for **Visual Studio 2022** and **.NET 8.0 Windows**.
 
-[.NET 8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+### Automatic Compilation
+Use the included `compilar.bat` in the root directory to generate a production-ready build:
+- **Build Target**: Release / x86
+- **Output Directory**: `C:\Users\Maxi\Desktop\Updater\Compilacion\`
+- **Packaging**: Single-file, Self-contained.
 
-## Dependencies
+### Core Technologies
+- **WPF (Windows Presentation Foundation)**: For the cinematic UI.
+- **Microsoft WebBrowser WebView2**: For future web integration.
+- **Parsec.Shaiya.Data**: Professional game data extraction and patching.
 
-[Microsoft.AspNet.WebApi.Client](https://www.nuget.org/packages/Microsoft.AspNet.WebApi.Client/)
+## 📁 Project Structure
 
-[Microsoft.Extensions.Configuration.Ini](https://www.nuget.org/packages/Microsoft.Extensions.Configuration.Ini/)
+- `/Updater`: Main source code.
+- `/Resources`: UI assets (Loto Goddesses, Icons, Strings).
+- `/Compilacion`: Final distribution builds.
 
-[Parsec.Shaiya.Data](https://www.nuget.org/packages/Parsec.Shaiya.Data/)
-
-## Build
-
-Use **Publish** instead of **Build** to output a single executable. (recommended)
-
-## Screenshots
-
-![Capture](https://github.com/kurtekat/shaiya-updater/assets/142125482/ee526f55-5a0f-45fa-a6ed-d231434b21f1)
-
-# Documentation
-
-This project is designed to be like the original application. Users are expected to design the interface and develop the code to suit their needs. The source code is shared as-is, with little or no support from the author(s).
-
-## Client Configuration
-
-```ini
-; Version.ini
-[Version]
-CheckVersion=3
-CurrentVersion=1
-```
-
-## Server Configuration
-
-https://github.com/kurtekat/kurtekat.github.io
-
-### Web
-
-```csharp
-// Updater/Common/Constants.cs
-public const string Source = "https://kurtekat.github.io";
-public const string WebBrowserSource = "https://google.com";
-```
-
-## Patching
-
-### Data
-
-https://www.elitepvpers.com/forum/shaiya-private-server/1953495-tool-shaiya-make-exe-client-updater-patcher.html
-
-https://www.elitepvpers.com/forum/shaiya-pserver-guides-releases/4937732-guide-how-delele-files-client-via-updater.html
-
-### Updater
-
-Assign `UpdaterVersion` and build the application.
-
-```csharp
-// Updater/Common/Constants.cs
-public const uint UpdaterVersion = 2;
-```
-
-Rename the executable to `new_updater` and upload it to the expected location.
-
-```
-https://website.com/shaiya/new_updater.exe
-```
-
-Assign `UpdaterVersion` in the configuration file.
-
-```ini
-; https://website.com/shaiya/UpdateVersion.ini
-[Version]
-CheckVersion=3
-PatchFileVersion=10
-UpdaterVersion=2
-```
+---
+**Shaiya Lotus** - *The clash of Goddesses has never looked so beautiful.* ⚔️💮
