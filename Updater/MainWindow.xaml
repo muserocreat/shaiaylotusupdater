@@ -1,0 +1,129 @@
+<Window x:Name="Window1" x:Class="Updater.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:local="clr-namespace:Updater"
+        mc:Ignorable="d"
+        Title="Shaiya Lotus Updater" Height="550" Width="750" ResizeMode="NoResize" WindowStyle="None"
+        MouseLeftButtonDown="Window1_MouseLeftButtonDown" WindowStartupLocation="CenterScreen"
+        Initialized="Window1_Initialized" Loaded="Window1_Loaded" Background="{StaticResource PrimaryBrush}">
+
+    <Border CornerRadius="0" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1">
+        <Grid x:Name="Grid1">
+            <Grid.Background>
+                <ImageBrush x:Name="BgImageBrush" ImageSource="pack://application:,,,/Resources/bg_lotus_1.png" Stretch="UniformToFill" Opacity="0.85" />
+            </Grid.Background>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Title Bar -->
+            <Border Grid.Row="0" Background="{StaticResource SecondaryBrush}" Panel.ZIndex="10">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="2" Opacity="0.7"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="SHAIYA LOTUS" VerticalAlignment="Center" Margin="12,0,0,0"
+                               Foreground="{StaticResource HighlightBrush}" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI">
+                        <TextBlock.Effect>
+                            <DropShadowEffect Color="{StaticResource HighlightColor}" BlurRadius="8" ShadowDepth="0" Opacity="0.8"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                    <TextBlock Grid.Column="1" Text="Updater" VerticalAlignment="Center" Margin="6,0,0,0"
+                               Foreground="{StaticResource TextDimBrush}" FontSize="11" FontFamily="Segoe UI"/>
+
+                    <!-- Server Status Indicator -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
+                        <Ellipse x:Name="StatusEllipse" Width="7" Height="7" Fill="#FF888888" VerticalAlignment="Center" Margin="0,1,6,0">
+                            <Ellipse.Effect>
+                                <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="0" Opacity="0.8"/>
+                            </Ellipse.Effect>
+                        </Ellipse>
+                        <TextBlock x:Name="StatusText" Text="CONECTANDO..." Foreground="#FF888888" FontSize="10" FontWeight="SemiBold" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <Button x:Name="ButtonMinimize" Grid.Column="3" Content="&#xE949;"
+                            Style="{StaticResource MinimizeButtonStyle}" Click="ButtonMinimize_Click"/>
+                    <Button x:Name="Button1" Grid.Column="4" Content="&#xE106;"
+                            Style="{StaticResource CloseButtonStyle}" Click="Button1_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Content area: WebView2 + Sidebar -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="62"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- WebView2 Browser -->
+                <Border Grid.Column="0" Margin="1,0,0,0" Background="Transparent">
+                    <wv2:WebView2 x:Name="WebView21" DefaultBackgroundColor="Transparent"/>
+                </Border>
+
+                <!-- Sidebar -->
+                <Border Grid.Column="1" Background="{StaticResource SecondaryBrush}"
+                        BorderBrush="{StaticResource AccentBrush}" BorderThickness="1,0,0,0">
+                    <StackPanel VerticalAlignment="Center" Margin="4,0">
+                        <Button Style="{StaticResource SidebarButtonStyle}" Tag="&#xE80F;" Content="INICIO"
+                                Click="SidebarHome_Click"/>
+                        <Button Style="{StaticResource SidebarButtonStyle}" Tag="&#xE12A;" Content="NOTICIAS"
+                                Click="SidebarNews_Click"/>
+                        <Button Style="{StaticResource SidebarButtonStyle}" Tag="&#xE896;" Content="DESCARGAS"
+                                Click="SidebarDownloads_Click"/>
+                        <Button Style="{StaticResource SidebarButtonStyle}" Tag="&#xE8BD;" Content="DISCORD"
+                                Click="SidebarDiscord_Click"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Bottom Panel -->
+            <Border Grid.Row="2" Background="{StaticResource SecondaryBrush}" Height="90" BorderThickness="0,1,0,0" BorderBrush="#FF2A2A3E" Panel.ZIndex="10">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" BlurRadius="20" ShadowDepth="-2" Opacity="0.6"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="16,10,16,10" VerticalAlignment="Center">
+                        <!-- Status text -->
+                        <TextBlock x:Name="TextBox1" Text="" Foreground="{StaticResource TextBrush}"
+                                   FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,6"/>
+
+                        <!-- Progress bar 1 (file download) -->
+                        <ProgressBar x:Name="ProgressBar1" Style="{StaticResource ModernProgressBarStyle}"
+                                     Value="0" Margin="0,0,0,4"/>
+
+                        <!-- Progress bar 2 (overall) -->
+                        <ProgressBar x:Name="ProgressBar2" Style="{StaticResource ModernProgressBarStyle}"
+                                     Value="0" Margin="0,0,0,4"/>
+
+                        <!-- Speed / info text -->
+                        <TextBlock x:Name="TextBlockSpeed" Text="" Foreground="{StaticResource TextDimBrush}"
+                                   FontSize="10" FontFamily="Segoe UI"/>
+                    </StackPanel>
+
+                    <!-- Play Button -->
+                    <Button x:Name="Button2" Grid.Column="1" Content="JUGAR"
+                            Style="{StaticResource PlayButtonStyle}" Margin="0,0,20,0"
+                            VerticalAlignment="Center" Click="Button2_Click"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
