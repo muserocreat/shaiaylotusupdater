@@ -29,7 +29,7 @@ namespace Updater
                 if (serverConfiguration.UpdaterVersion > Constants.UpdaterVersion)
                 {
                     backgroundWorker.ReportProgress(0, Strings.UserState1);
-                    UpdaterPatcher(httpClient);
+                    UpdaterPatcher(httpClient, backgroundWorker);
                     return;
                 }
 
@@ -137,7 +137,7 @@ namespace Updater
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -231,17 +231,17 @@ namespace Updater
             });
         }
 
-        /// <summary>
-        /// Downloads a new updater, starts a client process, passing "new updater" as the 
-        /// command-line argument, and terminates the current process.
-        /// 
-        /// Expect the client to delete the old updater, rename the new updater and create 
-        /// an updater process.
-        /// </summary>
-        private static void UpdaterPatcher(HttpClient httpClient)
+        /// <param name="httpClient"></param>
+        /// <param name="backgroundWorker"></param>
+        private static void UpdaterPatcher(HttpClient httpClient, BackgroundWorker backgroundWorker)
         {
             var newUpdater = new NewUpdater();
-            httpClient.DownloadFile(newUpdater.Url, newUpdater.Path);
+            
+            httpClient.DownloadFile(newUpdater.Url, newUpdater.Path, (downloaded, total) =>
+            {
+                var percentage = (int)((downloaded * 100) / total);
+                backgroundWorker.ReportProgress(percentage, new ProgressReport("ProgressBar1"));
+            });
 
             if (!File.Exists(newUpdater.Path))
                 return;

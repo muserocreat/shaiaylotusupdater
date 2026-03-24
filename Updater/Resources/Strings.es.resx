@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -139,10 +139,10 @@
     <value>Actualización completada</value>
   </data>
   <data name="SingleInstance" xml:space="preserve">
-    <value>La aplicación ya está ejecutándose.</value>
+    <value>Shaiya Lotus ya está abierto. Revisa la barra de tareas.</value>
   </data>
   <data name="GameWindow" xml:space="preserve">
-    <value>Cierre la aplicación del juego.</value>
+    <value>Shaiya Lotus ya está en ejecución. No se puede abrir más de una instancia del juego.</value>
   </data>
   <data name="UserState7" xml:space="preserve">
     <value>Construyendo archivo</value>

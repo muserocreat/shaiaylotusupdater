@@ -9,6 +9,7 @@ using Microsoft.Web.WebView2.Core;
 using Updater.Common;
 using Updater.Core;
 using Updater.Resources;
+using System.Windows.Media;
 
 namespace Updater
 {
@@ -19,6 +20,7 @@ namespace Updater
     {
         private readonly BackgroundWorker _backgroundWorker1;
         private readonly HttpClient _httpClient;
+        private System.Windows.Forms.NotifyIcon? _trayIcon;
 
         public MainWindow()
         {
@@ -32,6 +34,17 @@ namespace Updater
             var handler = new ProgressMessageHandler(new HttpClientHandler());
             handler.HttpReceiveProgress += ProgressMessageHandler_HttpReceiveProgress;
             _httpClient = new HttpClient(handler, true);
+
+            // System Tray Icon Setup
+            var iconPath = Path.Combine(AppContext.BaseDirectory, "Resources", "Icon", "IconGroup164.ico");
+            _trayIcon = new System.Windows.Forms.NotifyIcon();
+            _trayIcon.Text = "Shaiya Lotus";
+            if (File.Exists(iconPath))
+                _trayIcon.Icon = new System.Drawing.Icon(iconPath);
+            else
+                _trayIcon.Icon = System.Drawing.SystemIcons.Application;
+            _trayIcon.Visible = false;
+            _trayIcon.DoubleClick += (s, e) => RestoreFromTray();
         }
 
         private async Task InitializeWebView2Async()
@@ -120,7 +133,7 @@ namespace Updater
             };
             
             var transform = new System.Windows.Media.ScaleTransform(1.0, 1.0);
-            Button2.RenderTransformOrigin = new Point(0.5, 0.5);
+            Button2.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
             Button2.RenderTransform = transform;
 
             transform.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, animation);
@@ -129,15 +142,13 @@ namespace Updater
 
         private void Window1_Initialized(object sender, EventArgs e)
         {
-            if (DllImport.FindWindowW("GAME", "Shaiya") != IntPtr.Zero)
-            {
-                MessageBox.Show(Strings.GameWindow, Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                Application.Current.Shutdown(0);
-            }
+            // Game detection is now handled dynamically via CheckGameProcess() timer.
+            // The Play button will show "JUEGO ACTIVO" if game.exe is already running.
         }
 
         private System.Windows.Threading.DispatcherTimer? _statusTimer;
         private System.Windows.Threading.DispatcherTimer? _bgTimer;
+        private System.Windows.Threading.DispatcherTimer? _gameTimer;
         private int _currentBgIndex = 0;
         private readonly string[] _backgroundImages = new string[] 
         { 
@@ -155,8 +166,15 @@ namespace Updater
             _statusTimer.Interval = TimeSpan.FromSeconds(20);
             _statusTimer.Tick += async (s, ev) => await CheckServerStatusAsync();
             _statusTimer.Start();
+
+            _gameTimer = new System.Windows.Threading.DispatcherTimer();
+            _gameTimer.Interval = TimeSpan.FromSeconds(5);
+            _gameTimer.Tick += (s, ev) => CheckGameProcess();
+            _gameTimer.Start();
             
             await CheckServerStatusAsync();
+            CheckGameProcess();
+            await LoadPvpRankingAsync();
             StartDynamicBackground();
         }
 
@@ -187,6 +205,98 @@ namespace Updater
                 StatusEllipse.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 60, 60));
                 StatusText.Text = "SERVIDOR OFFLINE";
                 StatusText.Foreground = StatusEllipse.Fill;
+            }
+        }
+
+        private void CheckGameProcess()
+        {
+            var gameRunning = Process.GetProcessesByName("game").Length > 0;
+            if (gameRunning)
+            {
+                Button2.IsEnabled = false;
+                Button2.Content = "JUEGO ACTIVO";
+                // Stop breathing animation when game is running
+                if (Button2.RenderTransform is System.Windows.Media.ScaleTransform t)
+                {
+                    t.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, null);
+                    t.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, null);
+                }
+                _isPlayButtonBreathing = false;
+            }
+            else
+            {
+                Button2.IsEnabled = true;
+                Button2.Content = "JUGAR";
+            }
+        }
+
+        private async Task LoadPvpRankingAsync()
+        {
+            var rankings = await DatabaseManager.GetDailyTop5PvpAsync();
+
+            PvpRankItems.Children.Clear();
+
+            if (rankings.Count == 0)
+            {
+                PvpRankItems.Children.Add(new System.Windows.Controls.TextBlock
+                {
+                    Text = "Sin datos hoy",
+                    Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#666666")),
+                    FontSize = 10,
+                    FontFamily = new System.Windows.Media.FontFamily("Segoe UI"),
+                    HorizontalAlignment = System.Windows.HorizontalAlignment.Center
+                });
+                return;
+            }
+
+            string[] medals = { "🥇", "🥈", "🥉", "4.", "5." };
+            string[] colors = { "#FFD700", "#C0C0C0", "#CD7F32", "#AAAAAA", "#AAAAAA" };
+
+            for (int i = 0; i < rankings.Count && i < 5; i++)
+            {
+                var row = new System.Windows.Controls.Grid();
+                row.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = new GridLength(28) });
+                row.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                row.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = GridLength.Auto });
+                row.Margin = new Thickness(0, 2, 0, 2);
+
+                var medal = new System.Windows.Controls.TextBlock
+                {
+                    Text = medals[i],
+                    FontSize = i < 3 ? 14 : 11,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = System.Windows.HorizontalAlignment.Center
+                };
+                System.Windows.Controls.Grid.SetColumn(medal, 0);
+
+                var name = new System.Windows.Controls.TextBlock
+                {
+                    Text = rankings[i].CharName,
+                    Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colors[i])),
+                    FontSize = 11,
+                    FontWeight = i == 0 ? FontWeights.Bold : FontWeights.Normal,
+                    FontFamily = new System.Windows.Media.FontFamily("Segoe UI"),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextTrimming = TextTrimming.CharacterEllipsis
+                };
+                System.Windows.Controls.Grid.SetColumn(name, 1);
+
+                var kills = new System.Windows.Controls.TextBlock
+                {
+                    Text = rankings[i].Kills.ToString() + " kills",
+                    Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#888888")),
+                    FontSize = 10,
+                    FontFamily = new System.Windows.Media.FontFamily("Segoe UI"),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(6, 0, 0, 0)
+                };
+                System.Windows.Controls.Grid.SetColumn(kills, 2);
+
+                row.Children.Add(medal);
+                row.Children.Add(name);
+                row.Children.Add(kills);
+
+                PvpRankItems.Children.Add(row);
             }
         }
 
@@ -230,12 +340,36 @@ namespace Updater
             WindowState = WindowState.Minimized;
         }
 
+        private void HideToTray()
+        {
+            this.Hide();
+            if (_trayIcon != null)
+                _trayIcon.Visible = true;
+        }
+
+        private void RestoreFromTray()
+        {
+            this.Show();
+            this.WindowState = WindowState.Normal;
+            this.Activate();
+            if (_trayIcon != null)
+                _trayIcon.Visible = false;
+        }
+
         private void Button1_Click(object sender, RoutedEventArgs e)
         {
             if (_backgroundWorker1.IsBusy)
                 return;
 
-            Application.Current.Shutdown(0);
+            // Limpiar el icono de la bandeja antes de cerrar
+            if (_trayIcon != null)
+            {
+                _trayIcon.Visible = false;
+                _trayIcon.Dispose();
+                _trayIcon = null;
+            }
+
+            System.Windows.Application.Current.Shutdown(0);
         }
 
         private void Button2_Click(object sender, RoutedEventArgs e)
@@ -243,18 +377,25 @@ namespace Updater
             if (_backgroundWorker1.IsBusy)
                 return;
 
+            // Safety check: abort if game is already running (anti-multiclient)
+            if (Process.GetProcessesByName("game").Length > 0)
+            {
+                Button2.IsEnabled = false;
+                Button2.Content = "JUEGO ACTIVO";
+                return;
+            }
+
             try
             {
                 var fileName = Path.Combine(Directory.GetCurrentDirectory(), "game.exe");
                 Process.Start(fileName, "start game");
-
-                var currentProcess = Process.GetCurrentProcess();
-                currentProcess.Kill();
+                
+                // Enviar el Launcher a la bandeja del sistema (System Tray)
+                HideToTray();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Title, MessageBoxButton.OK, MessageBoxImage.Error);
-                Application.Current.Shutdown(ex.HResult);
+                System.Windows.MessageBox.Show(ex.Message, Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Copyright>Copyright (c) 2025 Shaiya Lotus</Copyright>
     <Title>Shaiya Lotus Updater</Title>
@@ -22,7 +23,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Resources\Icon\IconGroup164.ico" />
+    <Content Include="Resources\Icon\IconGroup164.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\bg_lotus_1.png" />
     <Resource Include="Resources\bg_lotus_2.png" />
     <Resource Include="Resources\bg_lotus_3.png" />
@@ -30,6 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="8.0.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
     <PackageReference Include="Parsec.Shaiya.Data" Version="1.0.6" />

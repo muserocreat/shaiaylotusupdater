@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -139,10 +139,10 @@
     <value>Update completed</value>
   </data>
   <data name="SingleInstance" xml:space="preserve">
-    <value>The application is already running.</value>
+    <value>Shaiya Lotus is already open. Check your taskbar.</value>
   </data>
   <data name="GameWindow" xml:space="preserve">
-    <value>Please close the game application.</value>
+    <value>Shaiya Lotus is already running. Only one instance of the game is allowed.</value>
   </data>
   <data name="UserState7" xml:space="preserve">
     <value>Building archive</value>
