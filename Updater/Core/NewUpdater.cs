@@ -18,7 +18,21 @@ namespace Updater.Core
         public NewUpdater()
         {
             Path = System.IO.Path.Combine(Directory.GetCurrentDirectory(), FileName);
+            
+#if DEBUG
+            // En modo DEBUG, primero verificar si existe un new_updater local para pruebas
+            string localPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "new_updater_local.exe");
+            if (File.Exists(localPath))
+            {
+                Url = localPath;
+            }
+            else
+            {
+                Url = $"{Constants.Source}/{FileName}";
+            }
+#else
             Url = $"{Constants.Source}/{FileName}";
+#endif
         }
     }
 }
